@@ -6,6 +6,7 @@ import eu.superhub.wp5.planner.planningstructure.GraphEdge;
 import eu.superhub.wp5.planner.planningstructure.GraphNode;
 import eu.superhub.wp5.plannerdataimporter.kml.RoadGraphKmlCreator;
 import org.openstreetmap.osm.data.coordinates.LatLon;
+import student.Planner;
 
 import java.awt.*;
 import java.io.*;
@@ -39,13 +40,18 @@ public class PlannerExecutor {
         System.out.println("Graph loaded.");
 
         //picks origin and destination nodes (feel free to modify)
-        GraphNode origin = newroadGraph.getNodeByNodeId(13823646l);
+        GraphNode origin = newroadGraph.getNodeByNodeId(13823646);
         GraphNode destination = newroadGraph.getNodeByNodeId(188755778);
+//        GraphNode origin = newroadGraph.getNodeByNodeId(26746953);
+//        GraphNode destination = newroadGraph.getNodeByNodeId(1037726044);
+//        GraphNode origin = newroadGraph.getNodeByNodeId(27590819);
+//        GraphNode destination = newroadGraph.getNodeByNodeId(282122103);
+
 
         System.out.println("Planning between: "+ origin.getId() + " and "+ destination.getId());
 
         //Here will be reference to your planner
-        PlannerInterface astar = getDummyPlanner();
+        PlannerInterface astar = new Planner();
 
         long time = System.currentTimeMillis();
         //here you plan!
@@ -55,7 +61,7 @@ public class PlannerExecutor {
 
         printPlanProperties(origin,destination,plan);
 
-        exportPlan(newroadGraph, origin, destination, plan);
+//        exportPlan(newroadGraph, origin, destination, plan);
 
     }
 
