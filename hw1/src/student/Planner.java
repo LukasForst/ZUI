@@ -56,7 +56,6 @@ public class Planner implements PlannerInterface {
         GraphNode startingNode = nodeToExpand.getNode();
         for (GraphEdge currEdge : edges) {
             GraphNode endNode = graph.getNodeByNodeId(currEdge.getToNodeId());
-
             Node newNode = new Node(startingNode, endNode, currEdge, nodeToExpand, getHeuristic(endNode));
 
             if (openListContains.containsKey(newNode.getNodeId())) {
