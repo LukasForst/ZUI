@@ -30,7 +30,7 @@ public class Reader {
 
             result = new Data(rowsConstrains, columnConstrains);
         } catch (IOException e) {
-            System.out.println(e);
+            e.printStackTrace();
         }
 
         return result;
