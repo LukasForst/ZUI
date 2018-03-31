@@ -3,162 +3,104 @@ package student;
 import java.util.*;
 
 public class Solver {
-    private final Data data;
     private final char[][] result;
+    private final int rowsCount;
+    private final int columnsCount;
 
     private final RowConstrains[] rowConstrains;
     private final ColumnConstrains[] columnConstrains;
 
+    private final DomainFactory domainFactory;
+
+    private final List<ResultData> resultData;
 
     public Solver(Data data) {
-        this.data = data;
-        this.result = new char[data.getRows()][data.getColumns()];
         this.rowConstrains = data.getRowsConstrains();
         this.columnConstrains = data.getColumnsConstrains();
+
+        rowsCount = data.getRows();
+        columnsCount = data.getColumns();
+
+        domainFactory = new DomainFactory();
+        result = new char[data.getRows()][data.getColumns()];
+
+        resultData = new LinkedList<>();
     }
 
-    public char[][] solve(Data data) {
-
-        //// TODO: 31-Mar-18 do stuff
-
-        return result;
+    public List<ResultData> solve() {
+        placeNext(0, 0);
+        return resultData;
     }
 
-    private void placeNext(int row, int col, Set<Character> domain) {
+    private void placeNext(int row, int col) {
+        Set<Character> domain = createDomain(row, col);
+        if (domain.isEmpty()) {
+            return;
+        }
 
+        for (char toPlace : domain) {
+            result[row][col] = toPlace;
+            if (columnsCount > col + 1) {
+                if (row == rowsCount - 1 && !isColumnCorrect(col)) return;
+
+                placeNext(row, col + 1);
+            } else if (rowsCount > row + 1) {
+                if (!isRowCorrect(row)) return;
+
+                placeNext(row + 1, 0);
+            } else {
+                if (!isRowCorrect(rowsCount - 1) || !isColumnCorrect(columnsCount - 1)) {
+                    return;
+                }
+
+                char[][] arrayToAdd = new char[rowsCount][columnsCount];
+                for (int i = 0; i < rowsCount; i++) {
+                    System.arraycopy(result[i], 0, arrayToAdd[i], 0, columnsCount);
+                }
+
+                resultData.add(new ResultData(arrayToAdd));
+            }
+        }
+    }
+
+    private boolean isColumnCorrect(int columnIdx) {
+        char[] data = new char[rowsCount];
+        for (int i = 0; i < data.length; i++) {
+            data[i] = result[i][columnIdx];
+        }
+        return domainFactory.createDomain(data, rowsCount, columnConstrains[columnIdx].constrains) == null;
+    }
+
+    private boolean isRowCorrect(int rowIdx) {
+        return domainFactory.createDomain(result[rowIdx], columnsCount, rowConstrains[rowIdx].constrains) == null;
     }
 
     private Set<Character> createDomain(int row, int col) {
         Set<Character> domain = new HashSet<>();
-        domain.addAll(createDomainForRow(row, col));
-        domain.addAll(createDomainForColumn(row, col));
+        Collection<Character> rowD = createDomainForRow(row, col);
+        Collection<Character> colD = createDomainForColumn(row, col);
+
+        for (Character character : rowD) {
+            if (colD.contains(character)) {
+                domain.add(character);
+            }
+        }
         return domain;
     }
 
-    private Collection<Character> createDomain(char[] data, int idx, List<Tuple> constrains){
-        Collection<Character> rowDomain = new LinkedList<>();
-
-        char[] rowData = data;
-        Iterator<Tuple> constrainsIterator = constrains.iterator();
-
-        if (!constrainsIterator.hasNext()) {
-            rowDomain.add('_');
-            return rowDomain;
-        }
-
-        char previousChar = '\n';
-        int currentCharCount = 0;
-        boolean shouldBeEmpty = false;
-        Tuple currentConstrain = null;
-
-        for (int i = 0; i < idx; i++) {
-            char currentChar = rowData[i];
-
-            if (currentChar == '_') {
-                previousChar = currentChar;
-                continue;
-            } else if (currentChar == previousChar) {
-                currentCharCount++;
-                assert currentConstrain != null;
-                assert currentConstrain.getBlockSize() >= currentCharCount;
-            } else {
-                if (!constrainsIterator.hasNext()) {
-                    shouldBeEmpty = true;
-                    break;
-                }
-                currentCharCount = 1;
-                currentConstrain = constrainsIterator.next();
-            }
-
-            previousChar = currentChar;
-        }
-
-        if(currentConstrain == null){
-            currentConstrain = constrainsIterator.next();
-            rowDomain.add('_');
-            rowDomain.add(currentConstrain.getColor());
-        } else if(shouldBeEmpty){
-            rowDomain.add('_');
-        } else if(previousChar == currentConstrain.getColor()){
-            if(currentCharCount < currentConstrain.getBlockSize()){
-                rowDomain.add('_');
-                rowDomain.add(currentConstrain.getColor());
-            } else if(currentCharCount == currentConstrain.getBlockSize()){
-                rowDomain.add('_');
-            } else{
-                System.err.println("Char: " + previousChar);
-                System.err.println("Constrain: " + currentConstrain);
-                assert false;
-            }
-        }
-
-        return rowDomain;
-    }
-
     private Collection<Character> createDomainForRow(int row, int col) {
-        Collection<Character> rowDomain = new LinkedList<>();
-
-        char[] rowData = result[row];
-        List<Tuple> constrains = rowConstrains[row].constrains;
-        Iterator<Tuple> constrainsIterator = constrains.iterator();
-
-        if (!constrainsIterator.hasNext()) {
-            rowDomain.add('_');
-            return rowDomain;
-        }
-
-        char previousChar = '\n';
-        int currentCharCount = 0;
-        boolean shouldBeEmpty = false;
-        Tuple currentConstrain = null;
-
-        for (int i = 0; i < col; i++) {
-            char currentChar = rowData[col];
-
-            if (currentChar == '_') {
-                previousChar = currentChar;
-                continue;
-            } else if (currentChar == previousChar) {
-                currentCharCount++;
-                assert currentConstrain != null;
-                assert currentConstrain.getBlockSize() >= currentCharCount;
-            } else {
-                if (!constrainsIterator.hasNext()) {
-                    shouldBeEmpty = true;
-                    break;
-                }
-                currentCharCount = 1;
-                currentConstrain = constrainsIterator.next();
-            }
-
-            previousChar = currentChar;
-        }
-
-        if(currentConstrain == null){
-            currentConstrain = constrainsIterator.next();
-            rowDomain.add('_');
-            rowDomain.add(currentConstrain.getColor());
-        } else if(shouldBeEmpty){
-            rowDomain.add('_');
-        } else if(previousChar == currentConstrain.getColor()){
-            if(currentCharCount < currentConstrain.getBlockSize()){
-                rowDomain.add('_');
-                rowDomain.add(currentConstrain.getColor());
-            } else if(currentCharCount == currentConstrain.getBlockSize()){
-                rowDomain.add('_');
-            } else{
-                System.err.println("Char: " + previousChar);
-                System.err.println("Constrain: " + currentConstrain);
-                assert false;
-            }
-        }
-
-        return rowDomain;
+        char[] data = result[row];
+        List<Tuple> con = rowConstrains[row].constrains;
+        return domainFactory.createDomain(data, col, con);
     }
 
     private Collection<Character> createDomainForColumn(int row, int col) {
-        Collection<Character> columnDomain = new LinkedList<>();
+        char[] data = new char[rowsCount];
+        for (int i = 0; i < data.length; i++) {
+            data[i] = result[i][col];
+        }
 
-        return columnDomain;
+        List<Tuple> con = columnConstrains[col].constrains;
+        return domainFactory.createDomain(data, row, con);
     }
 }

@@ -114,3 +114,27 @@ class ColumnConstrains {
         return sb.toString();
     }
 }
+
+class ResultData {
+    private char[][] data;
+
+    public ResultData(char[][] data) {
+        this.data = data;
+    }
+
+    public char[][] getData() {
+        return data;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        for (char[] aData : data) {
+            for (char anAData : aData) {
+                sb.append(anAData);
+            }
+            sb.append('\n');
+        }
+        return sb.toString();
+    }
+}
