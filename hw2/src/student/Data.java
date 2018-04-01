@@ -9,26 +9,26 @@ class Data {
     private final RowConstrains[] rowsConstrains;
     private final ColumnConstrains[] columnsConstrains;
 
-    public Data(RowConstrains[] rowsConstrains, ColumnConstrains[] columnsConstrains) {
+    Data(RowConstrains[] rowsConstrains, ColumnConstrains[] columnsConstrains) {
         this.rows = rowsConstrains.length;
         this.columns = columnsConstrains.length;
         this.rowsConstrains = rowsConstrains;
         this.columnsConstrains = columnsConstrains;
     }
 
-    public int getRows() {
+    int getRows() {
         return rows;
     }
 
-    public int getColumns() {
+    int getColumns() {
         return columns;
     }
 
-    public RowConstrains[] getRowsConstrains() {
+    RowConstrains[] getRowsConstrains() {
         return rowsConstrains;
     }
 
-    public ColumnConstrains[] getColumnsConstrains() {
+    ColumnConstrains[] getColumnsConstrains() {
         return columnsConstrains;
     }
 
@@ -53,16 +53,16 @@ class Tuple {
     private char color;
     private int blockSize;
 
-    public Tuple(char color, int blockSize) {
+    Tuple(char color, int blockSize) {
         this.color = color;
         this.blockSize = blockSize;
     }
 
-    public char getColor() {
+    char getColor() {
         return color;
     }
 
-    public int getBlockSize() {
+    int getBlockSize() {
         return blockSize;
     }
 
@@ -73,11 +73,9 @@ class Tuple {
 }
 
 class RowConstrains {
-    public final int idx;
-    public final List<Tuple> constrains;
+    final List<Tuple> constrains;
 
-    public RowConstrains(int idx, List<Tuple> constrains) {
-        this.idx = idx;
+    RowConstrains(List<Tuple> constrains) {
         this.constrains = constrains;
     }
 
@@ -95,11 +93,9 @@ class RowConstrains {
 }
 
 class ColumnConstrains {
-    public final int idx;
-    public final List<Tuple> constrains;
+    final List<Tuple> constrains;
 
-    public ColumnConstrains(int idx, List<Tuple> constrains) {
-        this.idx = idx;
+    ColumnConstrains(List<Tuple> constrains) {
         this.constrains = constrains;
     }
 
@@ -118,12 +114,8 @@ class ColumnConstrains {
 class ResultData {
     private char[][] data;
 
-    public ResultData(char[][] data) {
+    ResultData(char[][] data) {
         this.data = data;
-    }
-
-    public char[][] getData() {
-        return data;
     }
 
     @Override

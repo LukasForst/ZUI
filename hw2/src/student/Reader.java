@@ -6,8 +6,8 @@ import java.io.InputStreamReader;
 import java.util.LinkedList;
 import java.util.List;
 
-public class Reader {
-    public Data read() {
+class Reader {
+    Data read() {
         Data result = null;
         try {
             BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
@@ -20,12 +20,12 @@ public class Reader {
 
             for (int i = 0; i < rowsCount; i++) {
                 String[] line = reader.readLine().split(",");
-                rowsConstrains[i] = new RowConstrains(i, getOneLineData(line));
+                rowsConstrains[i] = new RowConstrains(getOneLineData(line));
             }
 
             for (int i = 0; i < columnsCount; i++) {
                 String[] line = reader.readLine().split(",");
-                columnConstrains[i] = new ColumnConstrains(i, getOneLineData(line));
+                columnConstrains[i] = new ColumnConstrains(getOneLineData(line));
             }
 
             result = new Data(rowsConstrains, columnConstrains);
