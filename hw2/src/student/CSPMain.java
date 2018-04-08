@@ -27,6 +27,7 @@ import java.util.List;
  * </ul>
  * </p>
  * I implemented slightly modified AC-3 algorithm which is creating domain (not only reducing) for next variable according to the constrain.
+ * Note that this implementation uses Forward checking for faster task evaluation. -> It is implemented as DomainFactory.
  */
 public class CSPMain {
     public static void main(String[] args) {
