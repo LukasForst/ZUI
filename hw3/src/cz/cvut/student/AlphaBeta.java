@@ -1,12 +1,13 @@
 package cz.cvut.student;
 
-import com.sun.org.apache.xml.internal.security.algorithms.implementations.IntegrityHmac;
 import cz.cvut.fel.aic.zui.gobblet.Gobblet;
 import cz.cvut.fel.aic.zui.gobblet.algorithm.Algorithm;
 import cz.cvut.fel.aic.zui.gobblet.environment.Board;
 import cz.cvut.fel.aic.zui.gobblet.environment.Move;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Comparator;
 
 public class AlphaBeta extends Algorithm {
     private static final int WHITE_PLAYER = 0;
@@ -18,51 +19,59 @@ public class AlphaBeta extends Algorithm {
     //beta - best known value for MIN phase
     @Override
     protected int runImplementation(Board game, int depth, int player, int alpha, int beta) {
-        if(alpha == Integer.MIN_VALUE){
-            alpha -= 10;
+        if (alpha == Integer.MIN_VALUE) {
+            alpha += 10;
         }
 
-        if(winningPlayer == Integer.MIN_VALUE){
+        if (beta == Integer.MAX_VALUE){
+            beta =-10;
+        }
+
+        if (winningPlayer == Integer.MIN_VALUE) {
             winningPlayer = player;
         }
 
-        Queue<Board> queue = evaluateSuccessors(game, player);
-        if (queue.isEmpty() || depth == 0) return game.evaluateBoard();
+        Collection<Board> succ = evaluateSuccessors(game, player);
+        if (succ.isEmpty() || depth == 0) {
+            if (player != WHITE_PLAYER) {
+                return -game.evaluateBoard();
+            }
+            return game.evaluateBoard();
+        }
 
         int b = beta;
-        int score = Integer.MIN_VALUE;
         boolean firstChild = true;
-        while (!queue.isEmpty()){
-            Board g = queue.poll();
-            score = Math.max(score, -run(g, depth - 1, Gobblet.switchPlayer(player), -b, -alpha));
+        for (Board g : succ) {
+            int v = -run(g, depth - 1, Gobblet.switchPlayer(player), -b, -alpha);
 
-            if(alpha < score){
-                score = Math.max(score, -run(g, depth - 1, Gobblet.switchPlayer(player), -beta, -alpha));
+            if (firstChild) {
+                firstChild = false;
+            } else {
+                if (alpha < v && v < beta) {
+                    v = -run(g, depth - 1, Gobblet.switchPlayer(player), -beta, -v);
+                }
             }
+            alpha = Math.max(alpha, v);
 
-            alpha = Math.max(alpha, score);
-
-            if (beta <= alpha) break;
+            if (beta <= alpha) return alpha;
             b = alpha + 1;
         }
-        return score;
+        return alpha;
     }
 
-    private Queue<Board> evaluateSuccessors(Board game, int player){
-        Queue<Board> queue;
-
-        if(WHITE_PLAYER == winningPlayer){
-            queue = new PriorityQueue<>((o1, o2) -> o2.evaluateBoard() - o1.evaluateBoard());
-        } else {
-            queue = new PriorityQueue<>((Comparator.comparingInt(Board::evaluateBoard)));
-        }
-
+    private Collection<Board> evaluateSuccessors(Board game, int player) {
         ArrayList<Move> successors = game.generatePossibleMoves(player);
-        for(Move m : successors){
-            Board g = new Board(game);
-            g.makeMove(m);
-            queue.add(g);
+        ArrayList<Board> result = new ArrayList<>(successors.size());
+        for (Move m : successors) {
+            Board b = new Board(game);
+            b.makeMove(m);
+            result.add(b);
         }
-        return queue;
+        if (WHITE_PLAYER == player) {
+            result.sort(((o1, o2) -> o2.evaluateBoard() - o1.evaluateBoard()));
+        } else {
+            result.sort((Comparator.comparingInt(Board::evaluateBoard)));
+        }
+        return result;
     }
 }

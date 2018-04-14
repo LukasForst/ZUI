@@ -20,16 +20,16 @@ public class Gobblet {
         //small
         //Value : -329
         // about 19000 nodes
-        int seed = 0;
-        int randomMoves = 12;
-        int depth = 3;
+//        int seed = 0;
+//        int randomMoves = 12;
+//        int depth = 3;
 
         //bigger
         //Value : 659
         //about 4 700 000 nodes
-//        int seed = 10;
-//        int randomMoves = 10;
-//        int depth = 5;
+        int seed = 10;
+        int randomMoves = 10;
+        int depth = 5;
 
 
         //even bigger
@@ -45,7 +45,6 @@ public class Gobblet {
         long currTime = System.currentTimeMillis();
 
         Algorithm ab = new AlphaBeta();
-
         System.out.println("Value : " + ab.run(game, depth, playerToMove, Integer.MIN_VALUE, Integer.MAX_VALUE));
         System.out.println("Nodes : " + ab.getNodesCount());
 
