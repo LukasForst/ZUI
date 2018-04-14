@@ -9,36 +9,40 @@ import java.util.ArrayList;
 import java.util.Random;
 
 public class AlphaBeta extends Algorithm {
+    private int winningPlayer = Integer.MIN_VALUE;
 
     //alpha - best known value for MAX phase
     //beta - best known value for MIN phase
     @Override
     protected int runImplementation(Board game, int depth, int player, int alpha, int beta) {
-
         ArrayList<Move> successors = game.generatePossibleMoves(player);
+        if (successors.isEmpty() || depth == 0) return game.evaluateBoard();
 
-        //negascout
-        if (successors.isEmpty() || depth == 0) {
-            return game.evaluateBoard();
+        if (winningPlayer == Integer.MIN_VALUE) {
+            winningPlayer = player;
         }
 
-        int b = beta;
-        for (int i = 0; i < successors.size(); i++) {
-            Move succ = successors.get(i);
-            Board nextGame = new Board(game);
-            nextGame.makeMove(succ);
+        if (winningPlayer == player) {
+            int score = Integer.MIN_VALUE;
+            for (Move m : successors) {
+                Board b = new Board(game);
+                b.makeMove(m);
+                score = Math.max(score, run(b, depth - 1, Gobblet.switchPlayer(player), alpha, beta));
+                alpha = Math.max(alpha, score);
+                if (alpha >= beta) break;
+            }
+            return score;
+        } else {
+            int score = Integer.MAX_VALUE;
 
-            int v = -run(nextGame, depth - 1, Gobblet.switchPlayer(player), -b, -alpha);
-            if (alpha < v && v < beta && i != 0) {
-                v = -run(nextGame, depth - 1, Gobblet.switchPlayer(player), -beta, -v);
+            for (Move m : successors) {
+                Board b = new Board(game);
+                b.makeMove(m);
+                score = Math.min(score, run(b, depth - 1, Gobblet.switchPlayer(player), alpha, beta));
+                beta = Math.min(beta, score);
+                if (alpha >= beta) break;
             }
-            alpha = Math.max(alpha, v);
-            if (alpha >= beta) {
-                return alpha;
-            }
-            b = alpha + 1;
+            return score;
         }
-
-        return alpha;
     }
 }
