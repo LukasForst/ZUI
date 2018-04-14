@@ -14,7 +14,8 @@ public class AlphaBeta extends Algorithm {
     private static final int BLACK = 4;
 
     private int winningPlayer = Integer.MIN_VALUE;
-
+public static boolean first = false;
+public static boolean second = false;
     //alpha - best known value for MAX phase
     //beta - best known value for MIN phase
     @Override
@@ -33,28 +34,30 @@ public class AlphaBeta extends Algorithm {
 
         Collection<Board> succ = evaluateSuccessors(game, player);
         if (succ.isEmpty() || depth == 0) {
-            if (player != WHITE_PLAYER) {
+            if (player != winningPlayer) {
                 return -game.evaluateBoard();
             }
             return game.evaluateBoard();
         }
 
-        int b = beta;
         boolean firstChild = true;
+        int score;
         for (Board g : succ) {
-            int v = -run(g, depth - 1, Gobblet.switchPlayer(player), -b, -alpha);
-
-            if (firstChild) {
+            if(firstChild){
+                score = -run(g, depth - 1, Gobblet.switchPlayer(player), -beta, -alpha);
                 firstChild = false;
             } else {
-                if (alpha < v && v < beta) {
-                    v = -run(g, depth - 1, Gobblet.switchPlayer(player), -beta, -v);
+                score = -run(g, depth - 1, Gobblet.switchPlayer(player), -alpha - 1, -alpha);
+                first = true;
+                if(alpha < score && score < beta){
+                    second = true;
+                    score = -run(g, depth - 1, Gobblet.switchPlayer(player), -beta, -score);
                 }
             }
-            alpha = Math.max(alpha, v);
+
+            alpha = Math.max(alpha, score);
 
             if (beta <= alpha) return alpha;
-            b = alpha + 1;
         }
         return alpha;
     }
