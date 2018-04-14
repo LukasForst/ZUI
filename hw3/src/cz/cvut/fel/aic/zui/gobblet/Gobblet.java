@@ -20,25 +20,25 @@ public class Gobblet {
         //small
         //Value : -329
         // about 19000 nodes
-        int seed = 0;
-        int randomMoves = 12;
-        int depth = 3;
+//        int seed = 0;
+//        int randomMoves = 12;
+//        int depth = 3;
 
         //bigger
         //Value : 659
         //about 4 700 000 nodes
-/*      int seed = 10;
-        int randomMoves = 10;
-        int depth = 5;
-*/
+//        int seed = 10;
+//        int randomMoves = 10;
+//        int depth = 5;
+
 
         //even bigger
         //Value : -41
         //about 19 000 000 nodes
-/*      int seed = 20;
+        int seed = 20;
         int randomMoves = 12;
         int depth = 5;
-*/
+
         Board game = new Board();
         int playerToMove = randomPlay(game, randomMoves, seed);
 
