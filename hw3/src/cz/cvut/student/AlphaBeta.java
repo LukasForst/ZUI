@@ -14,52 +14,55 @@ public class AlphaBeta extends Algorithm {
     private static final int BLACK = 4;
 
     private int winningPlayer = Integer.MIN_VALUE;
-public static boolean first = false;
-public static boolean second = false;
+
     //alpha - best known value for MAX phase
     //beta - best known value for MIN phase
     @Override
     protected int runImplementation(Board game, int depth, int player, int alpha, int beta) {
-        if (alpha == Integer.MIN_VALUE) {
-            alpha += 10;
-        }
-
-        if (beta == Integer.MAX_VALUE){
-            beta =-10;
-        }
-
         if (winningPlayer == Integer.MIN_VALUE) {
             winningPlayer = player;
         }
 
         Collection<Board> succ = evaluateSuccessors(game, player);
-        if (succ.isEmpty() || depth == 0) {
-            if (player != winningPlayer) {
-                return -game.evaluateBoard();
-            }
+        if (depth == 0 || game.isTerminate(player) != Board.DUMMY || succ.isEmpty()) {
             return game.evaluateBoard();
         }
 
         boolean firstChild = true;
         int score;
-        for (Board g : succ) {
-            if(firstChild){
-                score = -run(g, depth - 1, Gobblet.switchPlayer(player), -beta, -alpha);
-                firstChild = false;
-            } else {
-                score = -run(g, depth - 1, Gobblet.switchPlayer(player), -alpha - 1, -alpha);
-                first = true;
-                if(alpha < score && score < beta){
-                    second = true;
-                    score = -run(g, depth - 1, Gobblet.switchPlayer(player), -beta, -score);
+        if (winningPlayer == player) {
+            int b = beta;
+            for (Board g : succ) {
+                score = run(g, depth - 1, Gobblet.switchPlayer(player), alpha, b);
+                if(firstChild){
+                    firstChild = false;
+                } else{
+                    if(alpha < score){
+                        score = run(g, depth - 1, Gobblet.switchPlayer(player), alpha, beta);
+                    }
                 }
+                alpha = Math.max(alpha, score);
+                if (beta <= alpha) break;
+                b = alpha + 1;
             }
-
-            alpha = Math.max(alpha, score);
-
-            if (beta <= alpha) return alpha;
+            return alpha;
+        } else {
+            int b = alpha;
+            for (Board g : succ) {
+                score = run(g, depth - 1, Gobblet.switchPlayer(player), b, beta);
+                if(firstChild){
+                    firstChild = false;
+                } else{
+                    if(beta < score){
+                        score = run(g, depth - 1, Gobblet.switchPlayer(player), alpha, beta);
+                    }
+                }
+                beta = Math.min(beta, score);
+                if (beta <= alpha) break;
+                b = beta + 1;
+            }
+            return beta;
         }
-        return alpha;
     }
 
     private Collection<Board> evaluateSuccessors(Board game, int player) {
