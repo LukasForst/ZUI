@@ -27,17 +27,17 @@ public class Gobblet {
         //bigger
         //Value : 659
         //about 4 700 000 nodes
-//        int seed = 10;
-//        int randomMoves = 10;
-//        int depth = 5;
+        seed = 10;
+        randomMoves = 10;
+        depth = 5;
 
 
         //even bigger
         //Value : -41
         //about 19 000 000 nodes
-//        int seed = 20;
-//        int randomMoves = 12;
-//        int depth = 5;
+//        seed = 20;
+//        randomMoves = 12;
+//        depth = 5;
 
         Board game = new Board();
         int playerToMove = randomPlay(game, randomMoves, seed);
@@ -49,7 +49,7 @@ public class Gobblet {
         System.out.println("Nodes : " + ab.getNodesCount());
 
         currTime = System.currentTimeMillis() - currTime;
-        System.out.println("Time : " + currTime / 1E6);
+        System.out.println("Time : " + currTime * 1E-3);
     }
 
     public static int randomPlay(Board game, int randomMoves, int randomSeed) {

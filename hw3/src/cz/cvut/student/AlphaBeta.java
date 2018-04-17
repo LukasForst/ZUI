@@ -5,39 +5,49 @@ import cz.cvut.fel.aic.zui.gobblet.algorithm.Algorithm;
 import cz.cvut.fel.aic.zui.gobblet.environment.Board;
 import cz.cvut.fel.aic.zui.gobblet.environment.Move;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
+import java.util.*;
 
 public class AlphaBeta extends Algorithm {
-    private static final int WHITE_PLAYER = 0;
-
     private int winningPlayer = Integer.MIN_VALUE;
 
-    //alpha - best known value for MAX phase
-    //beta - best known value for MIN phase
-    @Override
-    protected int runImplementation(Board game, int depth, int player, int alpha, int beta) {
+    private void setPlayer(int player){
         if (winningPlayer == Integer.MIN_VALUE) {
             winningPlayer = player;
         }
+    }
 
-        if (alpha == Integer.MIN_VALUE) {
-            alpha += 1;
+    private int normalizeValue(int a ){
+        switch (a){
+            case Integer.MAX_VALUE:
+                return --a;
+            case Integer.MIN_VALUE:
+                return ++a;
+            default:
+                return a;
         }
+    }
 
-        if (beta == Integer.MAX_VALUE) {
-            beta -= 1;
+    private int evaluateBoard(int player, Board game){
+        if (player == Board.WHITE_PLAYER) {
+            return game.evaluateBoard();
+        } else {
+            return -game.evaluateBoard();
         }
+    }
 
-        Collection<Board> succ = evaluateSuccessors(game, player);
+    @Override
+    protected int runImplementation(Board game, int depth, int player, int alpha, int beta) {
+        setPlayer(player);
+        alpha = normalizeValue(alpha);
+        beta = normalizeValue(beta);
+
+        ArrayList<Board> succ = evaluateSuccessors(game, player);
         if (depth == 0 || game.isTerminate(player) != Board.DUMMY || succ.isEmpty()) {
-            if (player == WHITE_PLAYER) {
-                return game.evaluateBoard();
-            } else {
-                return -game.evaluateBoard();
-            }
+            return evaluateBoard(player, game);
+        } else if(depth == 1){
+            return evaluateBoard(player, succ.get(0));
         }
+
 
         boolean firstChild = true;
         int score;
@@ -57,7 +67,7 @@ public class AlphaBeta extends Algorithm {
         return alpha;
     }
 
-    private Collection<Board> evaluateSuccessors(Board game, int player) {
+    private ArrayList<Board> evaluateSuccessors(Board game, int player) {
         ArrayList<Move> successors = game.generatePossibleMoves(player);
         ArrayList<Board> result = new ArrayList<>(successors.size());
         for (Move m : successors) {
@@ -65,7 +75,7 @@ public class AlphaBeta extends Algorithm {
             b.makeMove(m);
             result.add(b);
         }
-        if (WHITE_PLAYER == player) {
+        if (Board.WHITE_PLAYER == player) {
             result.sort(((o1, o2) -> o2.evaluateBoard() - o1.evaluateBoard()));
         } else {
             result.sort((Comparator.comparingInt(Board::evaluateBoard)));
