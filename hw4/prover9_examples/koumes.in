@@ -1,0 +1,32 @@
+% Zadani:
+% Pøed pana Koumese položili 3 mince. Zlatou, støíbrnou a mìdìnou. 
+% Pokud øekne pravdivý výrok, dostane jednu minci, nikdo však nestanovil kterou. 
+% Pokud øekne nepravdivý výrok, nedostane nic. 
+% Který výrok mu zaruèí zisk zlaté mince?
+
+% Reseni:
+% Jedna se o vyrok: Nedostanu ani stribrnou ani medenou minci.
+% Pokud by dostal jednu z techto minci, byl by vyrok nepravdivy a nesmel by dostat nic -> spor.
+% Pokud by nedostal nic, byl by vyrok pravdivy a musel by dostat minci -> spor.
+% Musi dostat zlatou minci -> vyrok je pravdivy a dostane minci.
+
+set(prolog_style_variables).
+set(binary_resolution).
+assign(max_seconds,1).
+
+formulas(assumptions).
+ mince(zlata,1)&mince(stribrna,2)&mince(medena,3).
+ all X all Y all U all V (mince(X,U) & mince(Y,V) & $NE(U,V) -> -(dostane(X) & dostane(Y))).
+ all X (pravdivy(X)<->dostane(zlata)|dostane(stribrna)|dostane(medena)).
+ all X (-pravdivy(X)<-> -(dostane(zlata)|dostane(stribrna)|dostane(medena))).
+ pravdivy(1)<-> -(dostane(stribrna)|dostane(medena)).
+end_of_list.
+
+formulas(goals).
+ 
+ % snadne je dokazat, ze vyrok musi byt pravdivy
+ %-pravdivy(1).
+ % a take ze dostane zlatou minci
+ dostane(zlata).
+
+end_of_list.

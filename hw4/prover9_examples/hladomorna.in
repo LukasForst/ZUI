@@ -1,0 +1,51 @@
+set(prolog_style_variables).
+set(binary_resolution).
+assign(max_seconds, 3).
+
+% Odsouzenec je uveden do mistnosti, ze ktere vedou troje dvere. Jenom jedny dvere vedou na svobodu,
+% dalsi dvoje dvere znamenaji smrt - jedny vedou do hladomorny, druhe do mistnosti s jedovatymi 
+% pavouky. Zvolte spravne dvere na zaklade nasledujicich informaci:
+% 1. na dverich vedoucich na svobodu je pravdivy napis
+% 2. na dverich vedoucich k pavoukum je napis nepravdivy.
+% 3. napisy na dverich jsou nasledujici:
+% dvere A: Hladomorna.
+% dvere B: Dvere A vedou do hladomorny.
+% dvere C: Dvere B vedou k pavoukum.
+
+% Reseni: na svobodu vedou dvere B.
+% dokazte rezoluci, ze je to pravda
+
+% p(X) ... na dverich X je pravdivy napis
+% dvere(X,Y) ... dvere X vedou do mistnosti Y, X=[a,b,c], Y=[ven, hla, pav]
+
+formulas(assumptions).
+  % pocatecni postulaty (Otter/Prover9 jinak priradi dve ruzne konstanty stejnemu objektu) 
+  hla!=ven.
+  hla!=pav.
+  pav!=ven.
+  a!=b.
+  a!=c.
+  b!=c.
+  % vyroky na dverich
+  p(a)<->dvere(a,hla).
+  p(b)<->dvere(a,hla).
+  p(c)<->dvere(b,pav).
+  % na dverich vedoucich ven je pravdivy napis
+  all X (dvere(X,ven) -> p(X)).
+  % na dverich vedoucich k pavoukum 
+  all X (dvere(X,pav) -> -p(X)).
+  % prave jedny dvere vedou na svobodu, do hladomorny a k pavoukum
+  % tj. na kazde misto vedou alespon jedny dvere 
+  all X (dvere(a,X) | dvere(b,X) | dvere(c,X)).
+  % mozna by slo i all X exists Y (dvere(Y,X)).
+  % na vsechna mista vedou nejvyse jedny dvere
+  all X all Y all Z (X!=Y -> -(dvere(X,Z) & dvere(Y,Z))).
+  % vsechny dvere vedou na alespon jedno misto
+  all X (dvere(X,ven) | dvere(X,pav) | dvere(X,hla)).
+  % vsechny dvere vedou nejvyse na jedno misto
+  all X all Y all Z (Y!=Z -> -(dvere(X,Y) & dvere(X,Z))).
+end_of_list.
+
+formulas(goals).
+  dvere(b,ven).
+end_of_list.

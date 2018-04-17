@@ -1,0 +1,25 @@
+set(prolog_style_variables).
+set(binary_resolution).
+assign(max_seconds,1).
+
+% 6 is divisible by 3, 18 is divisible by 6,
+% transitivity: if x divides y and y divides z, then
+% x divides z too 
+
+% prove that 18 is divided by 3
+formulas(assumptions).
+  divides(3,6).
+  divides(6,18).
+  all X all Y all Z ( divides(X,Y) & divides(Y,Z) -> divides(X,Z) ).
+end_of_list.
+
+formulas(goals).
+  divides(3,18).
+
+% not as tivial as it looks -- statements that cannot be proven may result in infinite nesting, to avoid this it is necessary to employ control parameters such as max_seconds
+
+% why? the cause is the third formula, the transitive clause always allows for a new resolvent, always there are both positive and negative literals that can be matched (unified)
+
+ %divides(3,19).
+
+end_of_list.

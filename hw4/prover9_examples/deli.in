@@ -1,0 +1,28 @@
+set(prolog_style_variables).
+set(binary_resolution).
+assign(max_seconds,1).
+
+% uvodni jednoduchy priklad na delitelnost
+% 6 je delitelne 3, 18 je delitelne 6
+% pokud je cislo y delitelne jinym cislem x a y deli dalsi z,
+% pak i x deli z 
+
+% dokazte, ze 18 je delitelne 3
+formulas(assumptions).
+  deli(3,6).
+  deli(6,18).
+  all X all Y all Z ( deli(X,Y) & deli(Y,Z) -> deli(X,Z) ).
+end_of_list.
+
+formulas(goals).
+  deli(3,18).
+
+% priklad zase tak uplne trivialni neni - pokud se pokusime dokazat nedokazatelne tvrzeni (viz nize), 
+% pokus vede na nekonecne zanorovani - tj. je treba vyuzit parametru max_seconds
+
+% proc? je to kvuli formuli 3, tranzitivni klauzule umoznuje odvozovani novych a novych rezolvent,
+% stale je k dispozici pozitivni i negovany literal, ktere lze unifikovat
+
+% deli(3,19).
+
+end_of_list.

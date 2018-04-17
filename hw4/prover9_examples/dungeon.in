@@ -1,0 +1,49 @@
+set(prolog_style_variables).
+set(binary_resolution).
+assign(max_seconds, 3).
+
+% A convict is in a room with three doors. One of the doors leads to freedom, opening the other two doors is equal to the death penalty. One of them leads to dungeon, the other leads to a room with poisonous spiders. The task is to open the freedom door based on the following information:
+% 1. the statement on the freedom door is true, 
+% 2. the statement on the spider door is false,
+% 3. the statements are as follows:
+% door A: Dungeon.
+% door B: The door A leads to dungeon.
+% door C: The door B leads to spiders.
+
+% Solution: The door B leads to freedom.
+% prove it by resolution
+
+% p(X) ... true statement on door X
+% door(X,Y) ... door X leads to Y, X=[a,b,c], Y=[fre, dun, spi]
+
+formulas(assumptions).
+  % initial postulates (Prover9 does not work with UNA assumption, two constants may refer to the same object) 
+  dun!=fre.
+  dun!=spi.
+  spi!=fre.
+  a!=b.
+  a!=c.
+  b!=c.
+  % door statements
+  p(a)<->door(a,dun).
+  p(b)<->door(a,dun).
+  p(c)<->door(b,spi).
+  % statement 1
+  all X (door(X,fre) -> p(X)).
+  % statement 2 
+  all X (door(X,spi) -> -p(X)).
+  % common truths
+  % there is door leading to any mentioned place
+  all X (door(a,X) | door(b,X) | door(c,X)).
+  % alternatively all X exists Y (door(Y,X)).
+  % there is just one door leding to each place
+  all X all Y all Z (X!=Y -> -(door(X,Z) & door(Y,Z))).
+  % each door leads to some place
+  all X (door(X,fre) | door(X,spi) | door(X,dun)).
+  % each door leads to one place at most
+  all X all Y all Z (Y!=Z -> -(door(X,Y) & door(X,Z))).
+end_of_list.
+
+formulas(goals).
+  door(b,fre).
+end_of_list.
