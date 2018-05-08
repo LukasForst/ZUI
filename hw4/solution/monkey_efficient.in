@@ -1,0 +1,48 @@
+% Saved by Prover9-Mace4 Version 0.5, December 2007.
+
+set(ignore_option_dependencies). % GUI handles dependencies
+
+if(Prover9). % Options for Prover9
+  assign(max_seconds, 60).
+end_if.
+
+if(Mace4).   % Options for Mace4
+  assign(max_seconds, 60).
+end_if.
+
+formulas(assumptions).
+
+box != banana.
+box != monkey.
+monkey != banana.
+
+% box is not under banana at first
+-underBanana(box, s0).
+
+% monkey is not at box
+-atBox(monkey, s0).
+
+% monkey does not have banana
+-monkeyHasBanana(monkey, s0).
+
+% monkey is not near box
+-nearBox(monkey, s0).
+
+% when monkey is not near box -> go near box
+all s ((-nearBox(monkey, s)) -> (nearBox(monkey, result(monkeyWalk, s)))).
+% if box is not under banana and monkey is near box, move box under banana, monkey stays near box
+all s ((-underBanana(box, s) & (nearBox(monkey, s))) -> ((underBanana(box, result(monkeyMoved, s))) & (nearBox(monkey, result(monkeyMoved, s))))).
+% climb at box when it is under banana
+all s ((underBanana(box, s) & (-atBox(monkey, s))) -> (atBox(monkey, result(climb, s)))).
+% yeay, monkey has banana
+all s ((atBox(monkey, s)) -> (hasBanana(monkey, result(grasp, s)))).
+
+
+end_of_list.
+
+formulas(goals).
+
+exists s (hasBanana(monkey, s)).
+
+end_of_list.
+

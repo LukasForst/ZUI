@@ -1,0 +1,109 @@
+% Saved by Prover9-Mace4 Version 0.5, December 2007.
+
+set(ignore_option_dependencies). % GUI handles dependencies
+
+if(Prover9). % Options for Prover9
+  assign(max_seconds, 60).
+end_if.
+
+if(Mace4).   % Options for Mace4
+  assign(max_seconds, 60).
+end_if.
+
+formulas(assumptions).
+
+% yeah... dog is not banana and more funny assumptions
+box != picture.
+box != toilet.
+box != monkey.
+box != dog.
+box != banana.
+toilet != picture.
+toilet != monkey.
+toilet != dog.
+toilet != banana.
+monkey != picture.
+monkey != dog.
+monkey != banana.
+picture != dog.
+picture != banana.
+dog != banana.
+
+% box is climbable and movable and it is object -> all objects are then set up
+object(box).
+isClimbable(box).
+isMovable(box).
+
+object(toilet).
+isClimbable(toilet).
+-isMovable(toilet).
+
+object(picture).
+-isClimbable(picture).
+isMovable(picture).
+
+% can can climb but cant' walk
+agent(cat).
+-ableToWalk(cat).
+ableToClimb(cat).
+-bussy(cat, s0).
+all o (-atObject(o, cat, s0)).
+
+% dog can move things but can't climb things - agent as well
+agent(dog).
+ableToWalk(dog).
+-ableToClimb(dog).
+bussy(dog, s0).
+atObject(box, dog, s0).
+
+% initial position
+nearWidow(box, s0).
+atDoor(picture, s0).
+inCorner(toilet, s0).
+
+% o -> objects, s -> situation, a -> animal
+% no agent has banana and it is not object
+all a ((agent(a)) -> ((-object(a)) & (-hasBanana(a, s0)) & (-isClimbable(a)) & (-isMovable(a)))).
+% no object is agent and it us under banana
+all o ((object(o)) -> ((-agent(o)) & (-underBanana(o, s0)) & (-ableToWalk(o)) & (-ableToClimb(o)))).
+
+% moving objects situation
+all s all o ((underBanana(o, s)) -> ((-nearWindow(o, s)) & (-atDoor(o, s)) & (-inCorner(o, s)))).
+all s all o ((nearWindow(o, s)) -> ((-underBanana(o, s)) & (-atDoor(o, s)) & (-inCorner(o, s)))).
+all s all o ((atDoor(o, s)) -> ((-nearWindow(o, s)) & (-underBanana(o, s)) & (-inCorner(o, s)))).
+all s all o ((inCorner(o, s)) -> ((-nearWindow(o, s)) & (-atDoor(o, s)) & (-underBanana(o, s)))).
+
+% frames for being bussy on move nothing changes, climb changes not bussy to bussy as well as grasp
+all s all a ((bussy(a, s) -> (bussy(a, result(move, s))))).
+all s all a ((-bussy(a, s) -> (-bussy(a, result(move, s))))).
+all s all a ((-bussy(a, s) -> (bussy(a, result(climb, s))))).
+all s all a ((bussy(a, s) -> (bussy(a, result(climb, s))))).
+all s all a ((-bussy(a, s) -> (bussy(a, result(grasp, s))))).
+all s all a ((bussy(a, s) -> (bussy(a, result(grasp, s))))).
+
+% frames for underBanana - climb stays same, graps same, climb same, grasp same, only thing that changes is move that is handled separately
+all s all o (underBanana(o, s) -> underBanana(o, result(climb, s))).  
+all s all o (underBanana(o, s) -> underBanana(o, result(grasp, s))).  
+all s all o (-underBanana(o, s) -> -underBanana(o, result(climb, s))).
+all s all o (-underBanana(o, s) -> -underBanana(o, result(grasp, s))).
+
+% move object under banana in case it is movable and climbable object
+all s all o all a (((isMovable(o)) & (isClimbable(o)) & (ableToWalk(a)) & (-bussy(a, s)) & (-underBanana(o, s))) -> ((underBanana(o, result(move, s))))).
+
+% climb at object in case it is climbable, under banana and agent can climb
+all s all o all a (((isClimbable(o)) & (underBanana(o, s)) & (ableToClimb(a)) & (-bussy(a, s))) -> ((atObject(o, a, result(climb, s))))).
+
+% when at object that is under banana grasp banana!
+all s all o all a ((atObject(o, a, s) & (underBanana(o, s))) -> ((hasBanana(a, result(grasp, s))))).
+
+end_of_list.
+
+formulas(goals).
+
+exists s exists a (hasBanana(a, s)). %proved
+
+%exists s (hasBanana(monkey, s)). %proved
+%exists s (hasBanana(dog, s)). %no such situation exists
+%exists s (hasBanana(cat, s)). %proved
+
+end_of_list.
